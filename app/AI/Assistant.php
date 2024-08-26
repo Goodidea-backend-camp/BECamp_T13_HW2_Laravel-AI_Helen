@@ -90,4 +90,21 @@ class Assistant
 
         return $this;
     }
+
+    public function isNameAppropriate(string $name)
+    {
+        // 構建 message
+        $message = "This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'$name'";
+
+        $this->addMessage($message, 'user');
+
+        // 發送請求
+        $response = $this->client->chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $this->messages,
+        ])->choices[0]->message->content;
+
+        // 判斷回應是否為 true
+        return $response === 'true';
+    }
 }

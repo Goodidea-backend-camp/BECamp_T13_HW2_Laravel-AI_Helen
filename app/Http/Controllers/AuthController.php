@@ -6,9 +6,68 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use App\AI\Assistant;
 
 class AuthController extends Controller
 {
+    public function register(Request $request)
+    {
+        try {
+            $attributes = $request->validate([
+                'name' => 'required|string',
+                'email' => 'required|email',
+                'password' => 'required|string',
+                'self_introduction' => 'required|string',
+                'is_pro' => 'required|boolean',
+            ]);
+        } catch (ValidationException $e) {
+            $errors = [];
+            foreach ($e->errors() as $field => $messages) {
+                $errors[$field] = $messages[0];
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed.',
+                'errors' => $errors,
+            ], 422);
+        }
+
+        // 本地註冊 provider ＝ 1
+        $attributes['provider'] = 1;
+
+        // 驗證資料庫中是否已存在此 email，若已存在，顯示錯誤訊息
+        if (User::firstWhere('email', $request->email)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The email has already been taken.'
+            ], 400);
+        }
+
+        // 檢查使用者名稱是否違反善良風俗，若違反，顯示錯誤訊息
+        $assistant = new Assistant();
+        if (!$assistant->isNameAppropriate($attributes['name'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed.',
+                'errors' => [
+                    'name' => 'The name violates public morals. Please change.',
+                ],
+            ], 422);
+        }
+
+        // 依照自我介紹生成大頭貼（pending）
+        $attributes['avatar_file_path'] = 'pending';
+
+        // 將註冊資訊存入
+        User::create($attributes);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User registered successfully. Please check your email for verification.'
+        ]);
+    }
+
     public function login(Request $request)
     {
         try {
