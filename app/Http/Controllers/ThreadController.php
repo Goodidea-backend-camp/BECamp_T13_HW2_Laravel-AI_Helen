@@ -56,4 +56,23 @@ class ThreadController extends Controller
             ]
         ]);
     }
+
+    public function update(Thread $thread)
+    {
+        request()->validate([
+            'title' => 'required|string'
+        ]);
+
+        $thread->update([
+            'title' => request('title'),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => $thread->type,
+                'title' => $thread->title,
+            ]
+        ]);
+    }
 }
