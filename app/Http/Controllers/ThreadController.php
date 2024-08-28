@@ -14,8 +14,8 @@ class ThreadController extends Controller
         $user = auth()->user();
 
         if (!$user->is_pro) {
-            $threadCount = Thread::where('user_id', $user->id)->count();
-
+            $threadCount = Thread::where('user_id', $user->id)->whereNull('deleted_at')->count();
+            
             if ($threadCount >= 3) {
                 return response()->json([
                     'status' => 'error',
