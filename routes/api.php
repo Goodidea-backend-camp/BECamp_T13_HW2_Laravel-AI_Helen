@@ -14,7 +14,7 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::middleware('auth:sanctum')->post('/threads', [ThreadController::class, 'store']);
 // Route::middleware('auth:sanctum')->get('/threads/{thread}', [ThreadController::class, 'show']);
 Route::middleware(['auth:sanctum', 'can:update,thread'])->put('/threads/{thread}', [ThreadController::class, 'update']);
-// Route::middleware('auth:sanctum')->delete('/threads/{thread}', [ThreadController::class, 'destroy']);
+Route::middleware(['auth:sanctum', 'can:delete,thread'])->delete('/threads/{thread}', [ThreadController::class, 'destroy']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();

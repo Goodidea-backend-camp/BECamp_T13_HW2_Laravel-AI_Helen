@@ -43,10 +43,10 @@ class ThreadPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    // public function delete(User $user, Thread $thread): bool
-    // {
-    //     //
-    // }
+    public function delete(User $user, Thread $thread): bool
+    {
+        return $thread->user->is($user);
+    }
 
     /**
      * Determine whether the user can restore the model.

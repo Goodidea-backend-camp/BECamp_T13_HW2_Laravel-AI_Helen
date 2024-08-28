@@ -75,4 +75,14 @@ class ThreadController extends Controller
             ]
         ]);
     }
+
+    public function destroy(Thread $thread)
+    {
+        $thread->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Thread deleted successfully.',
+        ]);
+    }
 }
