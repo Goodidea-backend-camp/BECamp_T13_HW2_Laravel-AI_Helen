@@ -107,4 +107,15 @@ class Assistant
         // 判斷回應是否為 true
         return $response === 'true';
     }
+
+    public function sendChatMessage(array $record)
+    {
+        // 發送請求
+        $response = $this->client->chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $record,
+        ])->choices[0]->message->content;
+
+        return $response;
+    }
 }
