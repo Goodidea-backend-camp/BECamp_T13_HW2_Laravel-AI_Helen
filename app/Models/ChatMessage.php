@@ -14,7 +14,7 @@ class ChatMessage extends Model
     protected $fillable = [
         'role',
         'content',
-        'thread_id'
+        'thread_id',
     ];
 
     public function thread(): BelongsTo

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\AI\Assistant;
 use App\Models\ChatMessage;
-use App\Models\Thread;
 use Illuminate\Http\Request;
 
 class ChatMessageController extends Controller
@@ -14,20 +13,20 @@ class ChatMessageController extends Controller
         // 錯誤處理：免費的使用者同時最多10個 chat message
         $user = auth()->user();
 
-        if (!$user->is_pro) {
+        if (! $user->is_pro) {
             $chatMessageCount = ChatMessage::where('thread_id', 3)->where('role', 1)->count();
 
             if ($chatMessageCount >= 10) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Non-pro users can only have up to 10 message. Upgrade to pro account to create more messages.'
+                    'message' => 'Non-pro users can only have up to 10 message. Upgrade to pro account to create more messages.',
                 ], 429);
             }
         }
 
         // 取得當前使用者發送的訊息（從 request 中取得），驗證並儲存至資料庫
         $request->validate([
-            'content' => 'required|string'
+            'content' => 'required|string',
         ]);
 
         $currentChatMessageByUser = ChatMessage::create([
@@ -41,10 +40,10 @@ class ChatMessageController extends Controller
         $record = [];
 
         foreach ($recordInDatabase as $item) {
-            $role = $item['role'] == 1 ? "user" : ($item['role'] == 2 ? "assistant" : null);
+            $role = $item['role'] == 1 ? 'user' : ($item['role'] == 2 ? 'assistant' : null);
             $record[] = [
-                "role" => $role,
-                "content" => $item['content']
+                'role' => $role,
+                'content' => $item['content'],
             ];
         }
 
@@ -56,7 +55,7 @@ class ChatMessageController extends Controller
         $currentChatMessageByAI = ChatMessage::create([
             'role' => 2,
             'content' => $response,
-            'thread_id' => 3
+            'thread_id' => 3,
         ]);
 
         return response()->json([
@@ -70,8 +69,8 @@ class ChatMessageController extends Controller
                     'role' => $currentChatMessageByAI->role,
                     'content' => $currentChatMessageByAI->content,
 
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

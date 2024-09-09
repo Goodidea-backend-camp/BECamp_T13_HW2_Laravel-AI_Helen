@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\AI\Assistant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use App\AI\Assistant;
 
 class AuthController extends Controller
 {
@@ -20,9 +20,9 @@ class AuthController extends Controller
                 'self_introduction' => 'required|string',
                 'is_pro' => 'required|boolean',
             ]);
-        } catch (ValidationException $e) {
+        } catch (ValidationException $validationException) {
             $errors = [];
-            foreach ($e->errors() as $field => $messages) {
+            foreach ($validationException->errors() as $field => $messages) {
                 $errors[$field] = $messages[0];
             }
 
@@ -40,13 +40,13 @@ class AuthController extends Controller
         if (User::firstWhere('email', $request->email)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'The email has already been taken.'
+                'message' => 'The email has already been taken.',
             ], 400);
         }
 
         // 檢查使用者名稱是否違反善良風俗，若違反，顯示錯誤訊息
         $assistant = new Assistant();
-        if (!$assistant->isNameAppropriate($attributes['name'])) {
+        if (! $assistant->isNameAppropriate($attributes['name'])) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Validation failed.',
@@ -64,7 +64,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'User registered successfully. Please check your email for verification.'
+            'message' => 'User registered successfully. Please check your email for verification.',
         ]);
     }
 
@@ -76,9 +76,9 @@ class AuthController extends Controller
                 'email' => 'required|email',
                 'password' => 'required|string',
             ]);
-        } catch (ValidationException $e) {
+        } catch (ValidationException $validationException) {
             $errors = [];
-            foreach ($e->errors() as $field => $messages) {
+            foreach ($validationException->errors() as $field => $messages) {
                 $errors[$field] = $messages[0];
             }
 
@@ -90,10 +90,10 @@ class AuthController extends Controller
         }
 
         // 嘗試使用收到的帳號密碼登入
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Invalid credentials'
+                'message' => 'Invalid credentials',
             ], 400);
         }
 
@@ -102,17 +102,16 @@ class AuthController extends Controller
 
         // 簽發 token
         $token = $user->createToken(
-            'API token for ' . $user->email,
+            'API token for '.$user->email,
             ['*'],
             now()->addMonth() // expiration 為一個月
         )->plainTextToken; // 取 token 中的 plainTextToken
-
 
         // 回傳使用者資料和 token，狀態碼省略，因為預設為200，json() 第一個參數是 $data ，第二個參數是 http status code (default = 200)
         return response()->json([
             'status' => 'success',
             'message' => 'Authenticated',
-            'token' => $token
+            'token' => $token,
         ]);
     }
 

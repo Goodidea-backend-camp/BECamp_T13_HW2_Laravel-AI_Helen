@@ -91,10 +91,10 @@ class Assistant
         return $this;
     }
 
-    public function isNameAppropriate(string $name)
+    public function isNameAppropriate(string $name): bool
     {
         // 構建 message
-        $message = "This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'$name'";
+        $message = sprintf("This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'%s'", $name);
 
         $this->addMessage($message, 'user');
 

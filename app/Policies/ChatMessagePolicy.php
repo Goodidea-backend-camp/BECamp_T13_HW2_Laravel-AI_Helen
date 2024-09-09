@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\ChatMessage;
 use App\Models\Thread;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ChatMessagePolicy
 {
@@ -28,12 +27,12 @@ class ChatMessagePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user, $threadId)
+    public function create(User $user, $threadId): bool
     {
         $thread = Thread::where('id', $threadId)->first();
+
         return $thread && $thread->user_id === $user->id;
     }
-
 
     /**
      * Determine whether the user can update the model.

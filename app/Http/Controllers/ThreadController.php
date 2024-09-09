@@ -13,13 +13,13 @@ class ThreadController extends Controller
         // 錯誤處理：免費的使用者同時最多三個 thread
         $user = auth()->user();
 
-        if (!$user->is_pro) {
+        if (! $user->is_pro) {
             $threadCount = Thread::where('user_id', $user->id)->whereNull('deleted_at')->count();
-            
+
             if ($threadCount >= 3) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Non-pro users can only have up to 3 threads. Upgrade to pro account to create more threads.'
+                    'message' => 'Non-pro users can only have up to 3 threads. Upgrade to pro account to create more threads.',
                 ], 429);
             }
         }
@@ -27,11 +27,11 @@ class ThreadController extends Controller
         try {
             $attributes = $request->validate([
                 'type' => 'required|integer|min:1|max:2',
-                'title' => 'required|string'
+                'title' => 'required|string',
             ]);
-        } catch (ValidationException $e) {
+        } catch (ValidationException $validationException) {
             $errors = [];
-            foreach ($e->errors() as $field => $messages) {
+            foreach ($validationException->errors() as $field => $messages) {
                 $errors[$field] = $messages[0];
             }
 
@@ -53,14 +53,14 @@ class ThreadController extends Controller
             'data' => [
                 'type' => $thread->type,
                 'title' => $thread->title,
-            ]
+            ],
         ]);
     }
 
     public function update(Thread $thread)
     {
         request()->validate([
-            'title' => 'required|string'
+            'title' => 'required|string',
         ]);
 
         $thread->update([
@@ -72,7 +72,7 @@ class ThreadController extends Controller
             'data' => [
                 'type' => $thread->type,
                 'title' => $thread->title,
-            ]
+            ],
         ]);
     }
 

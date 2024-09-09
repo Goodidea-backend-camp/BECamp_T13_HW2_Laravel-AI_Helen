@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('chat_messages', function (Blueprint $table) {
-            $table->id();   
+            $table->id();
             $table->integer('role'); // 1 = user, 2= assistant
             $table->text('content');
             $table->timestamps();
