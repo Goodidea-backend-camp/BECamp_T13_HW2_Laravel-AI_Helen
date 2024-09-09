@@ -5,3 +5,7 @@ parameters:
 	level: 5
 	paths:
 		- app
+	ignoreErrors:
+		- 
+			path: app/Http/Controllers/AuthController.php
+			message: '#Call to an undefined method Laravel\\Sanctum\\Contracts\\HasAbilities::delete\(\)#'
