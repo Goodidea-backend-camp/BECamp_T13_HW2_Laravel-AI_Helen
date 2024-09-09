@@ -6,32 +6,18 @@ use App\AI\Assistant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        try {
-            $attributes = $request->validate([
-                'name' => 'required|string',
-                'email' => 'required|email',
-                'password' => 'required|string',
-                'self_introduction' => 'required|string',
-                'is_pro' => 'required|boolean',
-            ]);
-        } catch (ValidationException $validationException) {
-            $errors = [];
-            foreach ($validationException->errors() as $field => $messages) {
-                $errors[$field] = $messages[0];
-            }
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed.',
-                'errors' => $errors,
-            ], 422);
-        }
+        $attributes = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'self_introduction' => 'required|string',
+            'is_pro' => 'required|boolean',
+        ]);
 
         // 本地註冊 provider ＝ 1
         $attributes['provider'] = 1;
@@ -70,24 +56,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        try {
-            // 驗證收到的 request
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required|string',
-            ]);
-        } catch (ValidationException $validationException) {
-            $errors = [];
-            foreach ($validationException->errors() as $field => $messages) {
-                $errors[$field] = $messages[0];
-            }
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed.',
-                'errors' => $errors,
-            ], 422);
-        }
+        // 驗證收到的 request
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
 
         // 嘗試使用收到的帳號密碼登入
         if (! Auth::attempt($request->only('email', 'password'))) {
