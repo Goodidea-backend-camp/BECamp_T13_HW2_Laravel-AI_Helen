@@ -8,13 +8,13 @@ use Illuminate\Http\Request;
 
 class ChatMessageController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $threadId)
     {
         // 錯誤處理：免費的使用者同時最多10個 chat message
         $user = auth()->user();
 
-        if (! $user->is_pro) {
-            $chatMessageCount = ChatMessage::where('thread_id', 3)->where('role', 1)->count();
+        if (!$user->is_pro) {
+            $chatMessageCount = ChatMessage::where('thread_id', $threadId)->where('role', 1)->count();
 
             if ($chatMessageCount >= 10) {
                 return response()->json([
@@ -32,11 +32,11 @@ class ChatMessageController extends Controller
         $currentChatMessageByUser = ChatMessage::create([
             'role' => 1,
             'content' => $request['content'],
-            'thread_id' => 3,
+            'thread_id' => $threadId,
         ]);
 
         // 取得所有歷史訊息紀錄+當前使用者發送的訊息
-        $recordInDatabase = ChatMessage::where('thread_id', 3)->get();
+        $recordInDatabase = ChatMessage::where('thread_id', $threadId)->get();
         $record = [];
 
         foreach ($recordInDatabase as $item) {
@@ -55,7 +55,7 @@ class ChatMessageController extends Controller
         $currentChatMessageByAI = ChatMessage::create([
             'role' => 2,
             'content' => $response,
-            'thread_id' => 3,
+            'thread_id' => $threadId,
         ]);
 
         return response()->json([
