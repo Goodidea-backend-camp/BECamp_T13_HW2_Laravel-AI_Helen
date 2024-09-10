@@ -13,7 +13,7 @@ class ChatMessageController extends Controller
         // 錯誤處理：免費的使用者同時最多10個 chat message
         $user = auth()->user();
 
-        if (!$user->is_pro) {
+        if (! $user->is_pro) {
             $chatMessageCount = ChatMessage::where('thread_id', $threadId)->where('role', 1)->count();
 
             if ($chatMessageCount >= 10) {
