@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Thread;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class ThreadController extends Controller
 {
@@ -24,23 +23,10 @@ class ThreadController extends Controller
             }
         }
 
-        try {
-            $attributes = $request->validate([
-                'type' => 'required|integer|min:1|max:2',
-                'title' => 'required|string',
-            ]);
-        } catch (ValidationException $validationException) {
-            $errors = [];
-            foreach ($validationException->errors() as $field => $messages) {
-                $errors[$field] = $messages[0];
-            }
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed.',
-                'errors' => $errors,
-            ], 422);
-        }
+        $attributes = $request->validate([
+            'type' => 'required|integer|min:1|max:2',
+            'title' => 'required|string',
+        ]);
 
         $thread = Thread::create([
             'type' => $attributes['type'],
