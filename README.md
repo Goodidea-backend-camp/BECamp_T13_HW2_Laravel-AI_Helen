@@ -46,3 +46,40 @@ composer install
 - 本專案有使用 [Laravel Sail](https://laravel.com/docs/11.x/sail)，自己斟酌要不要使用。
 
 ## Working Flow
+
+## Feature
+### Authentication
+- 註冊
+- 登入
+- 登出
+
+### Thread
+- 新增一個對話串
+- 編輯對話串名稱
+- 刪除一個對話串
+
+### Message
+- 新增一則文字訊息並得到一則AI回覆文字訊息（Chat Thread）
+
+
+## Demo
+### Authentication
+- 註冊
+- 登入
+- 登出
+- 串接 OpenAI API ，透過夾帶著註冊名稱的 prompt，檢測名稱是否違反善良風俗
+
+https://github.com/user-attachments/assets/537448b6-b1a8-4b43-855b-7f576e835ec0
+
+### Thread
+- 新增、編輯、刪除一個對話串
+- 使用 Policy 進行新增、編輯、刪除權限控管
+
+https://github.com/user-attachments/assets/da5bb003-b0a1-48d0-959e-c66812601be0
+
+### Message
+- 新增一則文字訊息並得到一則AI回覆文字訊息（Chat Thread）
+- 串接 OpenAI API 完成
+
+https://github.com/user-attachments/assets/d61f2865-c44f-4a62-bd22-22dbfe62a158
+
