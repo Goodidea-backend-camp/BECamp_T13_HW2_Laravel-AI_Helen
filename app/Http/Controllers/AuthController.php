@@ -56,7 +56,6 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
         // 驗證收到的 request
         $request->validate([
             'email' => 'required|email',
@@ -81,7 +80,7 @@ class AuthController extends Controller
             now()->addMonth() // expiration 為一個月
         )->plainTextToken; // 取 token 中的 plainTextToken
 
-        // 回傳使用者資料和 token，狀態碼省略，因為預設為200，json() 第一個參數是 $data ，第二個參數是 http status code (default = 200)
+        // 回傳使用者資料和 token，狀態碼省略 (default = 200)
         return response()->json([
             'status' => 'success',
             'message' => 'Authenticated',
