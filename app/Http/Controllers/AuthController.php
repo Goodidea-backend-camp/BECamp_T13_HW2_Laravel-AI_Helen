@@ -24,7 +24,7 @@ class AuthController extends Controller
         $attributes['provider'] = User::PROVIDER_LOCAL;
 
         // 驗證資料庫中是否已存在此 email，若已存在，顯示錯誤訊息
-        if (null !== User::firstWhere('email', $request->email)) {
+        if (User::firstWhere('email', $request->email) !== null) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'The email has already been taken.',
