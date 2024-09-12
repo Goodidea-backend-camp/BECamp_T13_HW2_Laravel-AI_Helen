@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Thread;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ThreadController extends Controller
 {
@@ -19,7 +20,7 @@ class ThreadController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Non-pro users can only have up to 3 threads. Upgrade to pro account to create more threads.',
-                ], 429);
+                ], Response::HTTP_TOO_MANY_REQUESTS);
             }
         }
 

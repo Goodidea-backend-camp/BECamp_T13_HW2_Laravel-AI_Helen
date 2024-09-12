@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AI\Assistant;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ChatMessageController extends Controller
 {
@@ -20,7 +21,7 @@ class ChatMessageController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Non-pro users can only have up to 10 message. Upgrade to pro account to create more messages.',
-                ], 429);
+                ], Response::HTTP_TOO_MANY_REQUESTS);
             }
         }
 

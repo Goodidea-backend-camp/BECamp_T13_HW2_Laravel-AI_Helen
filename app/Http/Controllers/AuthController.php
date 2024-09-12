@@ -6,6 +6,7 @@ use App\AI\Assistant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
@@ -27,7 +28,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'The email has already been taken.',
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         // 檢查使用者名稱是否違反善良風俗，若違反，顯示錯誤訊息
@@ -39,7 +40,7 @@ class AuthController extends Controller
                 'errors' => [
                     'name' => 'The name violates public morals. Please change.',
                 ],
-            ], 422);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         // 依照自我介紹生成大頭貼（pending）
@@ -67,7 +68,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Invalid credentials',
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         // 取得已認證的使用者
@@ -93,6 +94,6 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         // 回應 204 No Content
-        return response()->noContent();
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }
