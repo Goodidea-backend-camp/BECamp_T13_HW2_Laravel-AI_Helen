@@ -11,12 +11,6 @@ class ChatMessage extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'role',
-        'content',
-        'thread_id',
-    ];
-
     public function thread(): BelongsTo
     {
         return $this->belongsTo(Thread::class);

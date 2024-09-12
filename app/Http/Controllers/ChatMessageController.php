@@ -30,11 +30,11 @@ class ChatMessageController extends Controller
             'content' => 'required|string',
         ]);
 
-        $currentChatMessageByUser = ChatMessage::create([
-            'role' => 1,
-            'content' => $request['content'],
-            'thread_id' => $threadId,
-        ]);
+        $currentChatMessageByUser = new ChatMessage();
+        $currentChatMessageByUser->role = 1;
+        $currentChatMessageByUser->content = $request['content'];
+        $currentChatMessageByUser->thread_id = $threadId;
+        $currentChatMessageByUser->save();
 
         // 取得所有歷史訊息紀錄+當前使用者發送的訊息
         $recordInDatabase = ChatMessage::where('thread_id', $threadId)->get();
@@ -53,11 +53,11 @@ class ChatMessageController extends Controller
         $response = $assistant->sendChatMessage($record);
 
         // 將當前訊息及當前 AI 回覆訊息儲存至資料庫
-        $currentChatMessageByAI = ChatMessage::create([
-            'role' => 2,
-            'content' => $response,
-            'thread_id' => $threadId,
-        ]);
+        $currentChatMessageByAI = new ChatMessage();
+        $currentChatMessageByAI->role = 2;
+        $currentChatMessageByAI->content = $response;
+        $currentChatMessageByAI->thread_id = $threadId;
+        $currentChatMessageByAI->save();
 
         return response()->json([
             'status' => 'success',
