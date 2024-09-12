@@ -21,7 +21,7 @@ class AuthController extends Controller
         ]);
 
         // 本地註冊 provider ＝ 1
-        $attributes['provider'] = 1;
+        $attributes['provider'] = User::PROVIDER_LOCAL;
 
         // 驗證資料庫中是否已存在此 email，若已存在，顯示錯誤訊息
         if (User::firstWhere('email', $request->email)) {

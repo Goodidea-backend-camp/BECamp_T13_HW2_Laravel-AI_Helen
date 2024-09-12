@@ -13,6 +13,10 @@ class Thread extends Model
     use HasFactory;
     use SoftDeletes;
 
+    public const TYPE_CHAT = 1;
+
+    public const TYPE_IMAGE = 2;
+
     protected $fillable = [
         'type',
         'title',

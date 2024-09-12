@@ -15,6 +15,10 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
 
+    public const PROVIDER_LOCAL = 1;
+
+    public const PROVIDER_GOOGLE = 2;
+
     /**
      * The attributes that are mass assignable.
      *
