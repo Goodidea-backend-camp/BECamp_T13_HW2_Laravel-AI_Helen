@@ -13,7 +13,7 @@ class ChatMessage extends Model
 
     public const ROLE_USER = 1;
 
-    public const ROLE_AI = 2;
+    public const ROLE_ASSISTANT = 2;
 
     public function thread(): BelongsTo
     {

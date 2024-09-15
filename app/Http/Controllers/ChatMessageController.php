@@ -47,7 +47,7 @@ class ChatMessageController extends Controller
             $record = [];
 
             foreach ($recordInDatabase as $item) {
-                $role = $item['role'] == 1 ? 'user' : ($item['role'] == 2 ? 'assistant' : null);
+                $role = $item['role'] == ChatMessage::ROLE_USER ? 'user' : ($item['role'] == ChatMessage::ROLE_ASSISTANT ? 'assistant' : null);
                 $record[] = [
                     'role' => $role,
                     'content' => $item['content'],
@@ -60,7 +60,7 @@ class ChatMessageController extends Controller
 
             // 將當前訊息及當前 AI 回覆訊息儲存至資料庫
             $currentChatMessageByAI = new ChatMessage();
-            $currentChatMessageByAI->role = ChatMessage::ROLE_AI;
+            $currentChatMessageByAI->role = ChatMessage::ROLE_ASSISTANT;
             $currentChatMessageByAI->content = $response;
             $currentChatMessageByAI->thread_id = $threadId;
             $currentChatMessageByAI->save();
