@@ -25,7 +25,7 @@ class ChatMessageController extends Controller
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Non-pro users can only have up to 10 message. Upgrade to pro account to create more messages.',
-                    ], Response::HTTP_TOO_MANY_REQUESTS);
+                    ], Response::HTTP_BAD_REQUEST);
                 }
             }
 

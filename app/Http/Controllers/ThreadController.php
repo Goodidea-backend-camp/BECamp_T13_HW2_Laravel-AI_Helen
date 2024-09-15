@@ -20,7 +20,7 @@ class ThreadController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Non-pro users can only have up to 3 threads. Upgrade to pro account to create more threads.',
-                ], Response::HTTP_TOO_MANY_REQUESTS);
+                ], Response::HTTP_BAD_REQUEST);
             }
         }
 
