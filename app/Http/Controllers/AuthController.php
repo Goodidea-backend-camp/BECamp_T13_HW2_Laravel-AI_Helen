@@ -17,7 +17,6 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string',
             'self_introduction' => 'required|string',
-            'is_pro' => 'required|boolean',
         ]);
 
         // 本地註冊 provider ＝ 1

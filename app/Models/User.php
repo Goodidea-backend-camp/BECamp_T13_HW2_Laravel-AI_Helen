@@ -31,7 +31,6 @@ class User extends Authenticatable
         'provider',
         'self_introduction',
         'avatar_file_path',
-        'is_pro',
     ];
 
     /**
