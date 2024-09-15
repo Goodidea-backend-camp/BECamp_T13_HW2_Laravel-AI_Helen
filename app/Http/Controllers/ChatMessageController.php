@@ -12,6 +12,11 @@ class ChatMessageController extends Controller
 {
     public function store(Request $request, $threadId)
     {
+        // 取得當前使用者發送的訊息，放在資料庫操作之前，避免若 validate() 未通過，需要 return 卻無法 rollback 資料
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
         // 錯誤處理：免費的使用者同時最多10個 chat message
         $user = auth()->user();
 
@@ -22,17 +27,14 @@ class ChatMessageController extends Controller
                 $chatMessageCount = ChatMessage::where('thread_id', $threadId)->where('role', ChatMessage::ROLE_USER)->lockForUpdate()->count();
 
                 if ($chatMessageCount >= 10) {
+                    DB::rollBack();
+
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Non-pro users can only have up to 10 message. Upgrade to pro account to create more messages.',
                     ], Response::HTTP_BAD_REQUEST);
                 }
             }
-
-            // 取得當前使用者發送的訊息（從 request 中取得），驗證並儲存至資料庫
-            $request->validate([
-                'content' => 'required|string',
-            ]);
 
             $currentChatMessageByUser = new ChatMessage();
             $currentChatMessageByUser->role = ChatMessage::ROLE_USER;
