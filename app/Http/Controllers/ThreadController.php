@@ -63,9 +63,8 @@ class ThreadController extends Controller
             'title' => 'required|string',
         ]);
 
-        $thread->update([
-            'title' => request('title'),
-        ]);
+        $thread->title = request('title');
+        $thread->save();
 
         return response()->json([
             'status' => 'success',
