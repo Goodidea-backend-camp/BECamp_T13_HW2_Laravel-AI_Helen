@@ -12,15 +12,12 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $attributes = $request->validate([
+        $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
             'password' => 'required|string',
             'self_introduction' => 'required|string',
         ]);
-
-        // 本地註冊 provider ＝ 1
-        $attributes['provider'] = User::PROVIDER_LOCAL;
 
         // 驗證資料庫中是否已存在此 email，若已存在，顯示錯誤訊息
         if (User::firstWhere('email', $request->email) !== null) {
@@ -32,7 +29,7 @@ class AuthController extends Controller
 
         // 檢查使用者名稱是否違反善良風俗，若違反，顯示錯誤訊息
         $assistant = new Assistant();
-        if (! $assistant->isNameAppropriate($attributes['name'])) {
+        if (! $assistant->isNameAppropriate($request['name'])) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Validation failed.',
@@ -42,11 +39,15 @@ class AuthController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // 依照自我介紹生成大頭貼（pending）
-        $attributes['avatar_file_path'] = 'pending';
-
         // 將註冊資訊存入
-        User::create($attributes);
+        $user = new User();
+        $user->name = $request['name'];
+        $user->email = $request['email'];
+        $user->password = $request['password'];
+        $user->self_introduction = $request['self_introduction'];
+        $user->provider = User::PROVIDER_LOCAL; // 本地註冊 provider ＝ 1
+        $user->avatar_file_path = 'pending'; // 依照自我介紹生成大頭貼（pending）
+        $user->save();
 
         return response()->json([
             'status' => 'success',

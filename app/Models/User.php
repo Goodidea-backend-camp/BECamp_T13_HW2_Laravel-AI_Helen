@@ -19,20 +19,6 @@ class User extends Authenticatable
     public const PROVIDER_GOOGLE = 2;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'provider',
-        'self_introduction',
-        'avatar_file_path',
-    ];
-
-    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
