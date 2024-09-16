@@ -15,6 +15,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/threads/{thread}', [ThreadController::class, 'update'])->middleware('can:update,thread');
     Route::delete('/threads/{thread}', [ThreadController::class, 'destroy'])->middleware('can:delete,thread');
 
-    Route::post('/threads/{threadId}/messages/text', [ChatMessageController::class, 'store'])
+    Route::post('/threads/{threadId}/messages', [ChatMessageController::class, 'store'])
         ->middleware('can:create,App\Models\ChatMessage,threadId');
 });
