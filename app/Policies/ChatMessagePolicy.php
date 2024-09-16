@@ -10,9 +10,9 @@ class ChatMessagePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user, $threadId): bool
+    public function create(User $user, Thread $thread): bool
     {
-        $thread = Thread::where('id', $threadId)->first();
+        $thread = Thread::where('id', $thread->id)->first();
 
         return $thread && $thread->user_id === $user->id;
     }

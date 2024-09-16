@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\AI\Assistant;
 use App\Models\ChatMessage;
+use App\Models\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class ChatMessageController extends Controller
 {
-    public function store(Request $request, $threadId)
+    public function store(Request $request, Thread $thread)
     {
         // 取得當前使用者發送的訊息，放在資料庫操作之前，避免若 validate() 未通過，需要 return 卻無法 rollback 資料
         $request->validate([
@@ -24,7 +25,7 @@ class ChatMessageController extends Controller
 
         try {
             if (! $user->is_pro) {
-                $chatMessageCount = ChatMessage::where('thread_id', $threadId)->where('role', ChatMessage::ROLE_USER)->lockForUpdate()->count();
+                $chatMessageCount = ChatMessage::where('thread_id', $thread->id)->where('role', ChatMessage::ROLE_USER)->lockForUpdate()->count();
 
                 if ($chatMessageCount >= 10) {
                     DB::rollBack();
@@ -39,11 +40,11 @@ class ChatMessageController extends Controller
             $currentChatMessageByUser = new ChatMessage();
             $currentChatMessageByUser->role = ChatMessage::ROLE_USER;
             $currentChatMessageByUser->content = $request['content'];
-            $currentChatMessageByUser->thread_id = $threadId;
+            $currentChatMessageByUser->thread_id = $thread->id;
             $currentChatMessageByUser->save();
 
             // 取得所有歷史訊息紀錄+當前使用者發送的訊息
-            $recordInDatabase = ChatMessage::where('thread_id', $threadId)->get();
+            $recordInDatabase = ChatMessage::where('thread_id', $thread->id)->get();
             $record = [];
 
             foreach ($recordInDatabase as $item) {
@@ -62,7 +63,7 @@ class ChatMessageController extends Controller
             $currentChatMessageByAI = new ChatMessage();
             $currentChatMessageByAI->role = ChatMessage::ROLE_ASSISTANT;
             $currentChatMessageByAI->content = $response;
-            $currentChatMessageByAI->thread_id = $threadId;
+            $currentChatMessageByAI->thread_id = $thread->id;
             $currentChatMessageByAI->save();
 
             DB::commit();
