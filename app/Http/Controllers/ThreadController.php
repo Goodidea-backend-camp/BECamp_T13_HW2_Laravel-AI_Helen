@@ -11,7 +11,7 @@ class ThreadController extends Controller
 {
     public function store(Request $request)
     {
-        $attributes = $request->validate([
+        $request->validate([
             'type' => 'required|integer|min:1|max:2',
             'title' => 'required|string',
         ]);
@@ -36,11 +36,12 @@ class ThreadController extends Controller
                 }
             }
 
-            $thread = Thread::create([
-                'type' => $attributes['type'],
-                'title' => $attributes['title'],
-                'user_id' => auth()->id(),
-            ]);
+            $thread = new Thread();
+            $thread->type = $request['type'];
+            $thread->title = $request['title'];
+            $thread->user_id = auth()->id();
+            $thread->save();
+
             DB::commit();
         } catch (\Throwable $throwable) {
             DB::rollBack();
