@@ -2,7 +2,11 @@
 
 namespace App\AI;
 
+use App\Models\nameCheckLog;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use OpenAI;
+use Symfony\Component\HttpFoundation\Response;
 
 class Assistant
 {
@@ -91,8 +95,19 @@ class Assistant
         return $this;
     }
 
-    public function isNameAppropriate(string $name): bool
+    public function isNameAppropriate(string $ipAddress, string $name, string $email): bool
     {
+        // 檢查過去 1 分鐘內該 IP 的請求數量
+        $recentRequests = DB::table('name_check_logs')
+            ->where('user_ip_address', $ipAddress)
+            ->where('created_at', '>=', Carbon::now()->subMinutes(1))
+            ->count();
+
+        if ($recentRequests >= 10) {
+            // 返回 400 錯誤碼
+            abort(Response::HTTP_BAD_REQUEST, 'Too many requests from this IP');
+        }
+
         // 構建 message
         $message = sprintf("This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'%s'", $name);
 
@@ -105,7 +120,18 @@ class Assistant
         ])->choices[0]->message->content;
 
         // 判斷回應是否為 true
-        return $response === 'true';
+        $result = $response === 'true';
+
+        $nameCheckLog = new nameCheckLog();
+        $nameCheckLog->user_ip_address = $ipAddress;
+        $nameCheckLog->user_name = $name;
+        $nameCheckLog->user_email = $email;
+        $nameCheckLog->message = $message;
+        $nameCheckLog->response = $response;
+        $nameCheckLog->result = $result;
+        $nameCheckLog->save();
+
+        return $result;
     }
 
     public function sendChatMessage(array $record)
