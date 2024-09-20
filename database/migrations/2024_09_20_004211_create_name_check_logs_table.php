@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('name_check_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('user_ip_address');
+            $table->string('ip_address');
+            $table->string('user_agent');
             $table->string('user_name');
             $table->string('user_email');
             $table->text('message');
             $table->string('response');
-            $table->boolean('result');
             $table->timestamps();
         });
     }

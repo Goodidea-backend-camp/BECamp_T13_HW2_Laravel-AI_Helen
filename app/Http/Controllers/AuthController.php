@@ -28,9 +28,8 @@ class AuthController extends Controller
         }
 
         // 檢查使用者名稱是否違反善良風俗，若違反，顯示錯誤訊息
-        $ipAddress = $request->getClientIp();
         $assistant = new Assistant();
-        if (! $assistant->isNameAppropriate($ipAddress, $request['name'], $request['email'])) {
+        if (! $assistant->isNameAppropriate($request)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Validation failed.',

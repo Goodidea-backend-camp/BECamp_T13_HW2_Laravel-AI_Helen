@@ -2,8 +2,9 @@
 
 namespace App\AI;
 
-use App\Models\nameCheckLog;
+use App\Models\NameCheckLog;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use OpenAI;
 use Symfony\Component\HttpFoundation\Response;
@@ -95,41 +96,61 @@ class Assistant
         return $this;
     }
 
-    public function isNameAppropriate(string $ipAddress, string $name, string $email): bool
+    public function isNameAppropriate(Request $request): bool
     {
-        // 檢查過去 1 分鐘內該 IP 的請求數量
-        $recentRequests = DB::table('name_check_logs')
-            ->where('user_ip_address', $ipAddress)
-            ->where('created_at', '>=', Carbon::now()->subMinutes(1))
-            ->count();
+        $ipAddress = $request->getClientIp();
+        $userAgent = request()->header('User-Agent');
+        $name = $request['name'];
+        $email = $request['email'];
 
-        if ($recentRequests >= 10) {
-            // 返回 400 錯誤碼
-            abort(Response::HTTP_BAD_REQUEST, 'Too many requests from this IP');
+        // 檢查過去 1 分鐘內該 IP 非常見瀏覽器的請求數量
+        $commonBrowsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Mozilla'];
+
+        DB::beginTransaction();
+
+        try {
+            $recentRequests = DB::table('name_check_logs')
+                ->where('ip_address', $ipAddress)
+                ->whereNotIn('user_agent', $commonBrowsers)
+                ->where('created_at', '>=', Carbon::now()->subMinutes(1))
+                ->lockForUpdate()
+                ->count();
+
+            if ($recentRequests >= 10) {
+                DB::rollBack();
+
+                abort(Response::HTTP_BAD_REQUEST, 'Request could not be processed at this time.');
+            }
+
+            // 構建 message
+            $message = sprintf("This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'%s'", $name);
+
+            $this->addMessage($message, 'user');
+
+            // 發送請求
+            $response = $this->client->chat()->create([
+                'model' => 'gpt-3.5-turbo',
+                'messages' => $this->messages,
+            ])->choices[0]->message->content;
+
+            // 判斷回應是否為 true
+            $result = $response === 'true';
+
+            $nameCheckLog = new NameCheckLog();
+            $nameCheckLog->ip_address = $ipAddress;
+            $nameCheckLog->user_agent = $userAgent;
+            $nameCheckLog->user_name = $name;
+            $nameCheckLog->user_email = $email;
+            $nameCheckLog->message = $message;
+            $nameCheckLog->response = $response;
+            $nameCheckLog->save();
+            DB::commit();
+        } catch (\Throwable $throwable) {
+
+            DB::rollBack();
+
+            throw $throwable;
         }
-
-        // 構建 message
-        $message = sprintf("This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'%s'", $name);
-
-        $this->addMessage($message, 'user');
-
-        // 發送請求
-        $response = $this->client->chat()->create([
-            'model' => 'gpt-3.5-turbo',
-            'messages' => $this->messages,
-        ])->choices[0]->message->content;
-
-        // 判斷回應是否為 true
-        $result = $response === 'true';
-
-        $nameCheckLog = new nameCheckLog();
-        $nameCheckLog->user_ip_address = $ipAddress;
-        $nameCheckLog->user_name = $name;
-        $nameCheckLog->user_email = $email;
-        $nameCheckLog->message = $message;
-        $nameCheckLog->response = $response;
-        $nameCheckLog->result = $result;
-        $nameCheckLog->save();
 
         return $result;
     }
