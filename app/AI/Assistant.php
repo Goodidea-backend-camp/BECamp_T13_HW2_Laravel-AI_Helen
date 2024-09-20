@@ -3,11 +3,8 @@
 namespace App\AI;
 
 use App\Models\NameCheckLog;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use OpenAI;
-use Symfony\Component\HttpFoundation\Response;
 
 class Assistant
 {
@@ -103,54 +100,28 @@ class Assistant
         $name = $request['name'];
         $email = $request['email'];
 
-        // 檢查過去 1 分鐘內該 IP 非常見瀏覽器的請求數量
-        $commonBrowsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Mozilla'];
+        // 構建 message
+        $message = sprintf("This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'%s'", $name);
 
-        DB::beginTransaction();
+        $this->addMessage($message, 'user');
 
-        try {
-            $recentRequests = DB::table('name_check_logs')
-                ->where('ip_address', $ipAddress)
-                ->whereNotIn('user_agent', $commonBrowsers)
-                ->where('created_at', '>=', Carbon::now()->subMinutes(1))
-                ->lockForUpdate()
-                ->count();
+        // 發送請求
+        $response = $this->client->chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $this->messages,
+        ])->choices[0]->message->content;
 
-            if ($recentRequests >= 10) {
-                DB::rollBack();
+        // 判斷回應是否為 true
+        $result = $response === 'true';
 
-                abort(Response::HTTP_BAD_REQUEST, 'Request could not be processed at this time.');
-            }
-
-            // 構建 message
-            $message = sprintf("This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'%s'", $name);
-
-            $this->addMessage($message, 'user');
-
-            // 發送請求
-            $response = $this->client->chat()->create([
-                'model' => 'gpt-3.5-turbo',
-                'messages' => $this->messages,
-            ])->choices[0]->message->content;
-
-            // 判斷回應是否為 true
-            $result = $response === 'true';
-
-            $nameCheckLog = new NameCheckLog();
-            $nameCheckLog->ip_address = $ipAddress;
-            $nameCheckLog->user_agent = $userAgent;
-            $nameCheckLog->user_name = $name;
-            $nameCheckLog->user_email = $email;
-            $nameCheckLog->message = $message;
-            $nameCheckLog->response = $response;
-            $nameCheckLog->save();
-            DB::commit();
-        } catch (\Throwable $throwable) {
-
-            DB::rollBack();
-
-            throw $throwable;
-        }
+        $nameCheckLog = new NameCheckLog();
+        $nameCheckLog->ip_address = $ipAddress;
+        $nameCheckLog->user_agent = $userAgent;
+        $nameCheckLog->user_name = $name;
+        $nameCheckLog->user_email = $email;
+        $nameCheckLog->message = $message;
+        $nameCheckLog->response = $response;
+        $nameCheckLog->save();
 
         return $result;
     }
