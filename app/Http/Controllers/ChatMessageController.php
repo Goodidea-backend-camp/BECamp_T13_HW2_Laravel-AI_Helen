@@ -15,7 +15,7 @@ class ChatMessageController extends Controller
     {
         // 取得當前使用者發送的訊息，放在資料庫操作之前，避免若 validate() 未通過，需要 return 卻無法 rollback 資料
         $request->validate([
-            'content' => 'required|string',
+            'content' => 'required|string|max:3000',
         ]);
 
         // 錯誤處理：免費的使用者同時最多10個 chat message
@@ -43,9 +43,14 @@ class ChatMessageController extends Controller
             $currentChatMessageByUser->thread_id = $thread->id;
             $currentChatMessageByUser->save();
 
-            // 取得所有歷史訊息紀錄+當前使用者發送的訊息
-            $recordInDatabase = ChatMessage::where('thread_id', $thread->id)->get();
+            // 取得所有歷史訊息紀錄+當前使用者發送的訊息(request 訊息加總設置為 19 則，以預防 request token 超限)
             $record = [];
+            $recordInDatabase = ChatMessage::where('thread_id', $thread->id)
+                ->orderBy('id', 'desc')
+                ->take(19)
+                ->select('id', 'role', 'content')
+                ->get()
+                ->sortBy('id'); // 使用 PHP 進行排序，不依賴資料庫
 
             foreach ($recordInDatabase as $item) {
                 $role = $item['role'] == ChatMessage::ROLE_USER ? 'user' : ($item['role'] == ChatMessage::ROLE_ASSISTANT ? 'assistant' : null);

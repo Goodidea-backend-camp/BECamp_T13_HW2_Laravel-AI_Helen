@@ -107,8 +107,9 @@ class Assistant
 
         // 發送請求
         $response = $this->client->chat()->create([
-            'model' => 'gpt-3.5-turbo',
+            'model' => 'gpt-4o-mini',
             'messages' => $this->messages,
+            'max_tokens' => 750, // 設定每則訊息上限為 3000 字元，換算而得 750 tokens
         ])->choices[0]->message->content;
 
         // 判斷回應是否為 true
@@ -130,7 +131,7 @@ class Assistant
     {
         // 發送請求
         $response = $this->client->chat()->create([
-            'model' => 'gpt-3.5-turbo',
+            'model' => 'gpt-4o-mini',
             'messages' => $record,
         ])->choices[0]->message->content;
 
