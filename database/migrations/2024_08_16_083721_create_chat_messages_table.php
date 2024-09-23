@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('chat_messages', function (Blueprint $table) {
             $table->id();
-            $table->integer('role'); // 1 = user, 2= assistant
-            $table->text('content');
+            $table->unsignedTinyInteger('role'); // 1 = user, 2= assistant
+            $table->text('content', 3000);
             $table->timestamps();
             $table->foreignId('thread_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
         });

@@ -18,6 +18,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->unsignedTinyInteger('provider'); // 1 = local, 2 = google
+            $table->text('self_introduction');
+            $table->string('avatar_file_path');
+            $table->boolean('is_pro')->default(false);
             $table->timestamps();
         });
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('threads', function (Blueprint $table) {
             $table->id();
-            $table->integer('type'); // 1 = chat, 2 = image
+            $table->unsignedTinyInteger('type'); // 1 = chat, 2 = image
             $table->string('title');
             $table->softDeletes();
             $table->timestamps();
