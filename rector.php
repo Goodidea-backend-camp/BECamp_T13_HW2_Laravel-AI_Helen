@@ -51,4 +51,5 @@ return RectorConfig::configure()
         ClosureToArrowFunctionRector::class,
         NullToStrictStringFuncCallArgRector::class,
         StaticArrowFunctionRector::class,
+        __DIR__.'/routes/api.php',
     ]);

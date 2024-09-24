@@ -2,6 +2,8 @@
 
 namespace App\AI;
 
+use App\Models\NameCheckLog;
+use Illuminate\Http\Request;
 use OpenAI;
 
 class Assistant
@@ -89,5 +91,51 @@ class Assistant
         ];
 
         return $this;
+    }
+
+    public function isNameAppropriate(Request $request): bool
+    {
+        $ipAddress = $request->getClientIp();
+        $userAgent = request()->header('User-Agent');
+        $name = $request['name'];
+        $email = $request['email'];
+
+        // 構建 message
+        $message = sprintf("This is a chat platform. The developer wants to check the name when registering. If the name filled in violates good customs, the name must be refilled. Please check the following name based on this background. If it does not violate good customs, please only reply 'true'. If it violates good customs, please only reply 'false':'%s'", $name);
+
+        $this->addMessage($message, 'user');
+
+        // 發送請求
+        $response = $this->client->chat()->create([
+            'model' => 'gpt-4o-mini',
+            'messages' => $this->messages,
+            'max_tokens' => 750, // 設定每則訊息上限為 3000 字元，換算而得 750 tokens
+        ])->choices[0]->message->content;
+
+        // 判斷回應是否為 true
+        $result = $response === 'true';
+
+        $nameCheckLog = new NameCheckLog();
+        $nameCheckLog->ip_address = $ipAddress;
+        $nameCheckLog->user_agent = $userAgent;
+        $nameCheckLog->user_name = $name;
+        $nameCheckLog->user_email = $email;
+        $nameCheckLog->message = $message;
+        $nameCheckLog->response = $response;
+        $nameCheckLog->save();
+
+        return $result;
+    }
+
+    public function sendChatMessage(array $record)
+    {
+        // 發送請求
+        $response = $this->client->chat()->create([
+            'model' => 'gpt-4o-mini',
+            'messages' => $record,
+            'max_tokens' => 750, // 設定每則訊息上限為 3000 字元，換算而得 750 tokens
+        ])->choices[0]->message->content;
+
+        return $response;
     }
 }
