@@ -1,11 +1,13 @@
-# Laravel OpenAI
+# AI-chat-chat
+這是一個可以與 AI 聊天的平台。
 
-## Introduction
+## Database Schema
 
-## Prerequisites
 
-## Installation (Author: [Helen](https://github.com/lovepp0518))
+## API Document
+[AI-chat-chat API 文件](https://hospitable-pound-cd1.notion.site/AI-chat-chat-API-548b8fccf2fa438795b0da669b117fa1?pvs=74)
 
+## Installation
 1. 若未下載 Docker Desktop 或是 [OrbStack](https://orbstack.dev/)（建議）者，需先下載。
 
 2. 先確認有沒有任何程序佔用 80 port（或是 Docker 要使用的 port 號），若有，需先停止。
@@ -36,17 +38,6 @@ composer install
 ```
 
 
-## 作業目標
-
-## Usage
-- 請 Fork 一份到 `Goodidea-backend-camp` 這個 Organization，名稱取叫 `BECamp_T13_HW2_Laravel-AI_{Your Name}`，例如 `BECamp_T13_HW2_Laravel-AI_JYu`。
-- 根據每個功能開 branch，發 PR 到自己的 main 分支。
-- 發 PR 前請先確認 CI 流程有通過。
-- 主專案不定時會進行調整，請盡量保持與主專案最新狀態。
-- 本專案有使用 [Laravel Sail](https://laravel.com/docs/11.x/sail)，自己斟酌要不要使用。
-
-## Working Flow
-
 ## Feature
 ### Authentication
 - 註冊
@@ -59,7 +50,7 @@ composer install
 - 刪除一個對話串
 
 ### Message
-- 新增一則文字訊息並得到一則AI回覆文字訊息（Chat Thread）
+- 新增一則文字訊息並得到一則AI回覆文字訊息
 
 
 ## Demo
@@ -67,7 +58,7 @@ composer install
 - 註冊
 - 登入
 - 登出
-- 串接 OpenAI API ，透過夾帶著註冊名稱的 prompt，檢測名稱是否違反善良風俗
+- 串接 OpenAI API，透過夾帶著註冊名稱的 prompt，檢測名稱是否違反善良風俗
 
 https://github.com/user-attachments/assets/537448b6-b1a8-4b43-855b-7f576e835ec0
 
@@ -78,8 +69,7 @@ https://github.com/user-attachments/assets/537448b6-b1a8-4b43-855b-7f576e835ec0
 https://github.com/user-attachments/assets/da5bb003-b0a1-48d0-959e-c66812601be0
 
 ### Message
-- 新增一則文字訊息並得到一則AI回覆文字訊息（Chat Thread）
-- 串接 OpenAI API 完成
+- 串接 OpenAI API，新增一則文字訊息並得到一則 AI 回覆文字訊息
 
 https://github.com/user-attachments/assets/d61f2865-c44f-4a62-bd22-22dbfe62a158
 
