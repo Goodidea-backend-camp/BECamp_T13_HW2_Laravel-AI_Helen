@@ -2,6 +2,7 @@
 這是一個可以與 AI 聊天的平台。
 
 ## Database Schema
+![diagram-export-2024-10-23-上午10_39_12](https://github.com/user-attachments/assets/9d77fe72-214d-4f18-8b6f-60c421addec5)
 
 
 ## API Document
